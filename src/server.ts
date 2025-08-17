@@ -1,13 +1,9 @@
-import express, { Request, Response } from "express";
+import { app } from "./app";
+import dotenv from "dotenv";
+import "./db";
 
-const app = express();
+dotenv.config();
 const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-
-app.get("/", (_, res: Response) => {
-  res.send("Hello from Express + TypeScript!");
-});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
