@@ -7,28 +7,19 @@ const handleFilter = async (req: Request, res: Response): Promise<void> => {
 
     for (const [key, value] of Object.entries(req.query)) {
       if (typeof value === "string" && value.includes(",")) {
-        const values = value.split(",").map((v) => v.trim());
-        filters[key] = { $in: values };
+        filters[key] = { $in: value.split(",").map((v) => v.trim()) };
+      } else if (typeof value === "string" && /^-?\d+(\.\d+)?$/.test(value)) {
+        filters[key] = Number(value);
       } else {
-        const numValue = Number(value);
-        filters[key] = isNaN(numValue) ? value : numValue;
+        filters[key] = value;
       }
     }
 
-    const result = await User.aggregate([{ $match: filters }]);
-
-    if (!result.length) {
-      res.status(404).json({
-        data: [],
-        message: "No data found",
-        total: result.length,
-        success: false,
-      });
-    }
+    const result = await User.find(filters);
 
     res.status(200).json({
       data: result,
-      message: "Users found",
+      message: result.length ? "Users found" : "No data found",
       total: result.length,
       success: true,
     });
